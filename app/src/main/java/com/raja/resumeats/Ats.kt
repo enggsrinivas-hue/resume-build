@@ -11,13 +11,17 @@ data class Cat(val name: String, val got: Int, val max: Int)
 data class AtsResult(val score: Int, val cats: List<Cat>, val issues: List<Issue>, val missingKeywords: List<String>)
 
 object RoleKeywords {
-    val families: Map<String, List<String>> = mapOf(
-        "IAM / Security" to listOf("Identity and Access Management", "IAM", "Active Directory", "SSO", "SAML", "OAuth", "MFA", "Okta", "SailPoint", "Privileged Access", "RBAC", "Access Reviews", "Provisioning", "Compliance", "Audit", "ServiceNow", "Entra ID", "Least Privilege"),
-        "QA / Testing" to listOf("Test Cases", "Test Plans", "Selenium", "Automation", "Regression", "API Testing", "Postman", "Jira", "Defect", "UAT", "SQL", "Agile", "CI/CD", "Performance Testing", "Bug Tracking", "Test Strategy"),
-        "Data / Reporting" to listOf("Power BI", "DAX", "Power Query", "SQL", "Excel", "Data Modeling", "Dashboards", "ETL", "KPI", "Reporting", "Data Visualization", "Python", "Data Analysis", "Stakeholders", "Automation", "Tableau"),
-        "Software developer" to listOf("Kotlin", "Java", "Python", "JavaScript", "REST API", "Git", "SQL", "Docker", "CI/CD", "Unit Testing", "Agile", "Microservices", "Cloud", "AWS", "Design Patterns", "Debugging"),
-        "General / Other" to listOf("Communication", "Leadership", "Project Management", "Stakeholder", "Problem Solving", "Teamwork", "Analysis", "Planning", "Reporting", "Process Improvement", "Customer Service", "Training", "Budget", "Compliance", "Excel", "Collaboration")
+    private val data: List<Triple<String, String, List<String>>> = listOf(
+        Triple("IAM and security", "IAM Access Management Analyst", listOf("Access Management", "User Provisioning", "Deprovisioning", "Joiner Mover Leaver", "Access Reviews", "Recertification", "RBAC", "Active Directory", "Entra ID", "ServiceNow", "SSO", "MFA", "Least Privilege", "Access Requests", "Audit", "Compliance", "SOX")),
+        Triple("IAM and security", "IAM Lead, Access Management", listOf("Access Management", "Team Lead", "Stakeholder Management", "Identity Governance", "Access Certification", "Policy", "Risk", "Audit", "Compliance", "Process Improvement", "Mentoring", "Escalation", "SLA", "Incident Management", "Roadmap", "ServiceNow", "RBAC", "Reporting")),
+        Triple("IAM and security", "SailPoint Lead / Engineer", listOf("SailPoint", "IdentityIQ", "IdentityNow", "Identity Governance", "Workflows", "BeanShell", "Connectors", "Provisioning", "Certifications", "Lifecycle Events", "Rules", "Role Modeling", "Application Onboarding", "REST API", "SCIM", "Active Directory", "Leadership", "Integration")),
+        Triple("IAM and security", "CyberArk / PAM Lead", listOf("CyberArk", "Privileged Access Management", "PAM", "Vault", "CPM", "PSM", "Safes", "Password Rotation", "Session Recording", "Just-in-Time Access", "Credential Management", "Account Onboarding", "Least Privilege", "Audit", "Compliance", "Leadership")),
+        Triple("IAM and security", "IAM Engineer (Okta / Entra ID)", listOf("Okta", "Entra ID", "Azure AD", "SAML", "OAuth", "OIDC", "SCIM", "SSO", "MFA", "Conditional Access", "Federation", "Directory Services", "PowerShell", "REST API", "Automation")),
+        Triple("IAM and security", "IAM Governance and Compliance Analyst", listOf("Access Certification", "SOX", "ISO 27001", "Audit", "Segregation of Duties", "Risk Assessment", "Controls", "Policies", "Evidence", "Remediation", "Governance", "Compliance", "Reporting")),
+        Triple("IAM and security", "Cybersecurity Analyst", listOf("SIEM", "Splunk", "Incident Response", "Vulnerability Management", "Threat Detection", "Firewall", "NIST", "ISO 27001", "Risk Assessment", "Endpoint Security", "SOC", "Log Analysis", "Phishing", "Compliance"))
     )
+    val families: Map<String, List<String>> = data.associate { it.second to it.third }
+    val groups: Map<String, List<String>> = data.groupBy({ it.first }, { it.second })
 }
 
 object Resume {
@@ -101,7 +105,7 @@ object AtsEngine {
         val missing = list - found.toSet()
         val target = min(10, list.size)
         val kw = min(25, found.size * 25 / target)
-        if (kw < 25) issues += Issue("kw", "Keywords", "Add missing keywords", "Found ${found.size} of ${list.size} common $family keywords. Add only the ones you really have.", 25 - kw)
+        if (kw < 25) issues += Issue("kw", "Keywords", "Add missing keywords", "Found ${found.size} of ${list.size} keywords for $family. Add only the ones you really have.", 25 - kw)
 
         // Impact (25)
         val bullets = lines.filter { it.kind == Kind.BULLET }.map { it.text }
